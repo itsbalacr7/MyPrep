@@ -1,0 +1,27 @@
+/* 1️⃣  Get each player’s first-ever login date */
+WITH first_login AS (
+    SELECT
+        player_id,
+        MIN(event_date) AS first_date
+    FROM Activity
+    GROUP BY player_id
+),
+
+/* 2️⃣  Keep the players who also logged in on the very next day */
+retained AS (
+    SELECT
+        f.player_id
+    FROM first_login f
+    JOIN Activity a
+      ON a.player_id = f.player_id
+     AND a.event_date = DATE_ADD(f.first_date, INTERVAL 1 DAY)
+)
+
+/* 3️⃣  Compute next-day retention and round to 2 decimals */
+SELECT
+    ROUND(
+        (SELECT COUNT(*) FROM retained)  /* players who came back next day  */
+        /
+        (SELECT COUNT(*) FROM first_login)  /* total unique players          */
+        , 2
+    ) AS fraction;
