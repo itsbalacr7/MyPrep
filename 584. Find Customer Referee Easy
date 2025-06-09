@@ -1,0 +1,5 @@
+SELECT
+name 
+FROM customer 
+WHERE reference_id <> 2 or Refernece_id is NULL
+group by name; 
