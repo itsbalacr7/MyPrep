@@ -1,0 +1,18 @@
+# Write your MySQL query statement below
+with coord as 
+(X,
+y,
+z
+FROM trialngle)
+SELECT 
+x,
+y,
+z,
+WHERE 
+  X+Y>z
+  Y+Z>X
+  X+Z>y
+THEN "Yes"
+ELSE "NO"
+END as triangle 
+FROM coord;
