@@ -1,0 +1,16 @@
+# Write your MySQL query statement below
+WIth BEmployee as 
+(SELECT 
+e.empid,
+e.Name,
+e.supervisor,
+e.salary,
+b.bonus
+FROM Employee e
+Group BY name)
+SELECT 
+e.name,
+b.bomus, 
+FROM Bemployee bm
+JOIN bemployee bm ON e.empid = bm.empid
+WHERE b.bonus < 1000;
