@@ -1,0 +1,14 @@
+with NODES as 
+(SELECT 
+id
+FROM tree)
+SELECT 
+ID 
+CASE
+  WHERE P_id is NULL THEN "ROOT"
+  WHERE P_id is NOT NULL THEN "INNER"
+  ELSE "LEAF"
+AS type 
+FROM tree t
+JOIN NODES N on t.id = N.id
+GROUP BY id; 
