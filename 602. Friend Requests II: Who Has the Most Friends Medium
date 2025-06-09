@@ -1,0 +1,21 @@
+# Write your MySQL query statement below
+with mostfriends as
+(SELECT 
+requester_id as id,
+accepter_id as friends_id
+UNOIN ALL
+SELECT 
+requester_id as friends_id,
+FROM Requestaccepted R
+), numbers as 
+(
+SELECT id
+COUNT (*) as Num
+FROM mostfiends m
+)
+SELECT 
+id
+num
+FROM numbers
+order by num DESC
+limit 1; 
