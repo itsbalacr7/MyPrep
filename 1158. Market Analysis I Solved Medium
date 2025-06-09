@@ -1,0 +1,17 @@
+# Write your MySQL query statement below
+WITH filtered_orders AS (
+  SELECT 
+    buyer_id,
+    order_date
+  FROM Orders
+  WHERE order_date BETWEEN '2019-01-01' AND '2019-12-31'
+)
+
+SELECT 
+  u.user_id AS buyer_id,
+  u.join_date,
+  COUNT(f.order_date) AS orders_in_2019
+FROM Users u
+LEFT JOIN filtered_orders f
+  ON u.user_id = f.buyer_id
+GROUP BY u.user_id, u.join_date;
