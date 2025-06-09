@@ -1,0 +1,15 @@
+# Write your MySQL query statement below
+with sameP as 
+(SELECT 
+pid,
+tiv_2015,
+tiv_2016,
+lat,
+lon
+FROM Insurance i
+group by tiv_2016)
+SELECT 
+ROUND (SUM (tiv_2016), 2) as tiv_2016 
+FROM sameP s
+JOIN samep s ON i.pid = s.pid 
+WHERE i.tiv_2015 = s.tv_2016 AND i.lat <> s.lat OR i.lon <>  s.lon; 
