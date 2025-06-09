@@ -1,0 +1,47 @@
+# Write your MySQL query statement below
+with managers as 
+(select id,
+name,
+department,
+managerid
+from employee e
+JOIN employee m ON e.id = m.managerid
+WHERE e.id = m.managerid AND m.managerid > 5)
+SELECT
+name FROM managers;
+
+
+
+#correct
+
+WITH expanded AS (
+  SELECT *,
+         SUM(frequency) OVER (ORDER BY num) AS running_total,
+         SUM(frequency) OVER () AS total_count
+  FROM Numbers
+),
+median_range AS (
+  SELECT num, total_count,
+         LAG(running_total, 1, 0) OVER (ORDER BY num) + 1 AS start_pos,
+         running_total AS end_pos
+  FROM expanded
+),
+final AS (
+  SELECT
+    CASE
+      WHEN total_count % 2 = 1 THEN  -- Odd
+        CAST((
+          SELECT num
+          FROM median_range
+          WHERE total_count / 2 + 1 BETWEEN start_pos AND end_pos
+        ) AS FLOAT)
+      ELSE  -- Even
+        CAST((
+          SELECT AVG(num)
+          FROM median_range
+          WHERE total_count / 2 BETWEEN start_pos AND end_pos
+             OR total_count / 2 + 1 BETWEEN start_pos AND end_pos
+        ) AS FLOAT)
+    END AS median
+)
+SELECT median FROM final;
