@@ -1,0 +1,17 @@
+# Write your MySQL query statement below
+WIth Prices as (
+    SELECT 
+    Product_id,
+    New_price as price,
+    Change_date 
+    FROM Products P
+    WHERE change_date = '2019-08-16'
+)
+SELECT 
+ price,
+ product_id,
+ FROM Prices
+CASE 
+ WHEN price is NULL THEN 10
+ ELSE price
+Group BY product_id; 
