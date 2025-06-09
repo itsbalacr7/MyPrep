@@ -1,0 +1,19 @@
+SELECT name 
+FROM salesperson s
+JOIN salesperson s ON o.sale_id = s.sales_id
+AND company c ON o.com_id = c.com_id
+WHERE com_is is NULL
+GROUP BY name;
+
+#corrected ones 
+
+WITH RedSales AS (
+    SELECT o.sales_id
+    FROM Orders o
+    JOIN Company c ON o.com_id = c.com_id
+    WHERE c.name = 'RED'
+)
+
+SELECT s.name
+FROM SalesPerson s
+WHERE s.sales_id NOT IN (SELECT sales_id FROM RedSales);
