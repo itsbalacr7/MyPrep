@@ -1,0 +1,31 @@
+With Weekly as 
+(
+SELECT 
+Visited_on, 
+SUM(amount) OVER (Order By visited_on ROWS BETWEEN 6 PRECEDING AND Current Row) as amount #=
+FROM Customer C
+Group BY visited_on
+)
+SELECT 
+visited_on,
+amount,
+Round(amount / 7,2) as average_amount
+FROM Weekly
+order by visited_on ASC;
+
+#corrected 
+WITH Weekly AS (
+  SELECT 
+    visited_on, 
+    SUM(amount) OVER (
+      ORDER BY visited_on 
+      ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+    ) AS amount
+  FROM Customer
+)
+SELECT 
+  visited_on,
+  amount,
+  ROUND(amount / 7, 2) AS average_amount
+FROM Weekly
+ORDER BY visited_on ASC;
