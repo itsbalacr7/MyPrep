@@ -1,0 +1,17 @@
+# CTE
+With Feb as 
+(SELECT 
+p.product_id,
+p.product_name,
+o.order_date,
+o.Unit
+FROM Products P
+JOIN Orders o ON o.product_id = p.product_id
+WHERE o.order_date BETWEEN '2020-02-01' AND '2020-02-29')
+SELECT 
+product_name,
+SUM(unit) as Unit
+FROM Feb 
+Group BY product_name
+HAVING UNit >= 100
+Order by product_name DESC;
