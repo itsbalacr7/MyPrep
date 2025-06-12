@@ -1,0 +1,8 @@
+# Write your MySQL query statement below
+SELECT 
+Name,
+SUM(R.distance) as travelled_distance
+FROM Users U
+JOIN Rides R ON U.id = R.user_id
+Group By user_id 
+Order BY Travelled_distance DESC, Name;
