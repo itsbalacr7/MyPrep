@@ -1,0 +1,49 @@
+# CTE
+With BUYING as
+(SELECT 
+ stock_name,
+ operation,
+ operation_day,
+ SUM(price) as BUYING_SUM
+FROM Stocks S
+WHERE operation = 'Buy'
+GROUP BY Stock_name
+), 
+SELLING as
+(SELECT 
+ stock_name,
+ operation,
+ operation_day,
+ SUM(price) as SELLING_SUM
+FROM Stocks S
+WHERE operation = 'Sell'
+GROUP BY Stock_name)
+SELECT 
+Stock_name,
+B.BUYING_SUM - SL.SELLING_SUM as Capital_gain_loss
+FROM SELLING SL
+JOIN BUYING B
+ORDER BY Capital_gain_loss DESC; 
+
+#Corrected
+WITH BUYING AS (
+  SELECT 
+    stock_name,
+    SUM(price) AS buying_sum
+  FROM Stocks
+  WHERE operation = 'Buy'
+  GROUP BY stock_name
+), 
+SELLING AS (
+  SELECT 
+    stock_name,
+    SUM(price) AS selling_sum
+  FROM Stocks
+  WHERE operation = 'Sell'
+  GROUP BY stock_name
+)
+SELECT 
+  B.stock_name,
+  S.selling_sum - B.buying_sum AS capital_gain_loss
+FROM BUYING B
+JOIN SELLING S ON B.stock_name = S.stock_name;
