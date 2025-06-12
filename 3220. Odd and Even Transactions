@@ -1,0 +1,30 @@
+WITH ODD as
+(SELECT 
+SUM(amount) as odd_sum,
+transaction_date
+FROM transactions             
+Group BY transaction_date
+HAVING MOD(SUM(amount), 2) = 1
+), 
+EVEN as
+(SELECT 
+SUM(AMOUNT) as EVEN_SUM,
+transaction_date
+FROM transactions
+GROUP BY transaction_date
+HAVING MOD(SUM(amount), 2) = 0
+)
+SELECT 
+COALESCE(O.transaction_date, E.transaction_date) as transaction_dateE    #COALESCE brings non null values first unlike CONCAT
+E.EVEN_SUM, 
+o.odd_sum
+FROM ODD O
+LEFT JOIN EVEN E ON O.transaction_date = E.transaction_date
+UNION
+SELECT 
+COALESCE(E.transaction_date,O.transaction_date) as transaction_date     #COALESCE brings non null values first unlike CONCAT
+E.EVEN_SUM, 
+o.odd_sum
+FROM EVEN E
+LEFT JOIN ODD O ON O.transaction_date = E.transaction_date
+ORDER BY transaction_date ASC;
