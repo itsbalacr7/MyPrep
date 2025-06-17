@@ -1,0 +1,15 @@
+# Write your MySQL query statement below
+SELECT
+CASE 
+ WHEN MONTH(sale_date) IN (12,1,2) THEN 'Winter' 
+ WHEN MONTH(sale_date) IN (3,4,5) THEN 'Spring'
+ WHEN MONTH(sale_date) IN (6,7,8) THEN 'Summer'
+ WHEN MONTH(sale_date) IN (9,10,11) THEN 'Fall'
+ END as Season,
+Category,
+SUM(quantity) as total_quantity,
+SUM(price) as total_revenue
+FROM Products P
+JOIN Sales S ON P.product_id = S.product_id
+GROUP BY Category
+ORDER BY season ASC, (price*quantity);
