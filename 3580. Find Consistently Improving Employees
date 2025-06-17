@@ -1,0 +1,21 @@
+with LAST3 as 
+(SELECT 
+REVIEW_ID,
+employee_id,
+review_date,
+rating,
+e.name
+FROM 
+Performance_reviews P 
+JOIN Employee E ON P.Employee_id = E.employee_id
+Order BY review_date DESC
+LIMIT 3
+),
+) 
+SELECT 
+Employee_id,
+name,
+CASE 
+ WHEN LAG(rating,3,1) THEN SUB(Rating,1,0) ELSE 0 END as Improvement_score  #to Find the employee who rating is improving in last 3 review and comparing their score 
+FROM LAST3
+ORDER BY Improve_score ASC, Name ASC;
