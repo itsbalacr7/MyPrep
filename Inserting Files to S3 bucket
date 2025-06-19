@@ -1,0 +1,13 @@
+s3.create_bucket(Bucket=bucket, …)  #Make a Folder in the Sky                                                          
+event = { "user_id": "U123", "ip": "203.0.113.45", … }     #Pack Up an Event                                   
+key = "events/U123/1687112345.json"
+s3.put_object(Bucket=bucket, Key=key, Body=json.dumps(event))  #Give It a Name & Put It on the Shelf
+tsw.create_database(DatabaseName="fraud_db")
+tsw.create_table(DatabaseName="fraud_db", TableName="events_stream", …)  #Writing a Quick Note in Your Cloud Notebook (Timestream)
+record = {
+  'Dimensions': [ {'Name':'user_id','Value':'U123'}, … ],               #Write Down a Measurement
+  'MeasureName': 'session_duration_ms',
+  'MeasureValue': '3500',
+  'Time': '1687112345678'
+}
+tsw.write_records(DatabaseName="fraud_db", TableName="events_stream", Records=[record])
