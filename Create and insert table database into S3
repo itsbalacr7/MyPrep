@@ -1,0 +1,72 @@
+#Creat and Upload to S3
+
+import boto3
+import json
+from datetime import datetime
+
+s3 = boto3.client('s3', region_name='us-east-1')
+bucket = 'fraud-events-ny-dev'  # change your initials/env
+
+# 1. Create bucket (idempotent)
+s3.create_bucket(
+    Bucket=bucket,
+    CreateBucketConfiguration={'LocationConstraint':'us-east-1'}
+)
+
+# 2. Upload a sample event JSON
+event = {
+    "user_id": "U123",
+    "ip": "203.0.113.45",
+    "session_time": datetime.utcnow().isoformat(),
+    "device": "iPhone12,1"
+}
+key = f"events/{event['user_id']}/{int(datetime.utcnow().timestamp())}.json"
+
+s3.put_object(
+    Bucket=bucket,
+    Key=key,
+    Body=json.dumps(event),
+    ContentType='application/json'
+)
+print(f"Uploaded event → s3://{bucket}/{key}")
+
+#Write to Amazon Timestream
+
+import boto3
+from time import time
+
+tsw = boto3.client('timestream-write', region_name='us-east-1')
+database = 'fraud_db'
+table    = 'events_stream'
+
+# 1. Create database and table (if needed)
+tsw.create_database(DatabaseName=database)
+tsw.create_table(
+    DatabaseName=database,
+    TableName=table,
+    RetentionProperties={
+        'MemoryStoreRetentionPeriodInHours': 24,
+        'MagneticStoreRetentionPeriodInDays': 30
+    }
+)
+
+# 2. Write a record
+now = int(time() * 1000)  # epoch ms
+record = {
+    'Dimensions': [
+        {'Name':'user_id', 'Value':'U123'},
+        {'Name':'device',  'Value':'iPhone12,1'}
+    ],
+    'MeasureName': 'session_duration_ms',
+    'MeasureValue': '3500',
+    'MeasureValueType': 'BIGINT',
+    'Time': str(now)
+}
+
+tsw.write_records(
+    DatabaseName=database,
+    TableName=table,
+    Records=[record],
+    CommonAttributes={}
+)
+print("Record written to Timestream")
