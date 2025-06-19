@@ -1,0 +1,50 @@
+import boto3
+
+fd = boto3.client('frauddetector', region_name='us-east-1')
+fd.create_event_type(
+    eventTypeName='login_event',
+    eventVariables=['user_id', 'ip_address', 'session_duration_ms', 'device'],
+    labels=['fraud', 'legit']
+)
+print("Event type ‘login_event’ created.")
+
+# 1) Define a rule: if session > 1 hour, mark “legit”
+rule = {
+    'detectorId':      'login_detector',
+    'ruleId':          'long_session_legit',
+    'ruleVersion':     '1',
+    'expression':      'session_duration_ms > 3600000',
+    'language':        'DETECTORPL',
+    'outcomes':        ['legit']
+}
+
+# 2) Create the detector:
+fd.create_detector(
+    detectorId='login_detector',
+    eventTypeName='login_event',
+    rules=[rule]
+)
+print("Detector ‘login_detector’ with one rule created.")
+
+import json
+from datetime import datetime
+
+# Build the same “event” dict from Module 1:
+event = {
+    'user_id':             'U123',
+    'ip_address':          '203.0.113.45',
+    'session_duration_ms': '3500',
+    'device':              'iPhone12,1'
+}
+
+response = fd.get_event_prediction(
+    detectorId='login_detector',
+    detectorVersionId='$LATEST',
+    eventId=str(int(datetime.utcnow().timestamp())),
+    eventTimestamp=datetime.utcnow().isoformat(),
+    eventTypeName='login_event',
+    entities=[{'entityType': 'user_id', 'entityId': event['user_id']}],
+    eventVariables=event
+)
+
+print(json.dumps(response['prediction'], indent=2))
