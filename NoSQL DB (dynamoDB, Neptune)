@@ -1,0 +1,90 @@
+#DynamoDB table
+
+import boto3
+from botocore.exceptions import ClientError
+
+dynamodb = boto3.client('dynamodb', region_name='us-east-1')
+table_name = 'fraud_users'
+
+# 1. Create table if it doesn’t exist
+try:
+    dynamodb.describe_table(TableName=table_name)
+    print(f"Table {table_name} already exists.")
+except dynamodb.exceptions.ResourceNotFoundException:
+    dynamodb.create_table(
+        TableName=table_name,
+        KeySchema=[{'AttributeName': 'user_id', 'KeyType': 'HASH'}],
+        AttributeDefinitions=[{'AttributeName': 'user_id', 'AttributeType': 'S'}],
+        BillingMode='PAY_PER_REQUEST'
+    )
+    print(f"Creating table {table_name}…")
+    waiter = dynamodb.get_waiter('table_exists')
+    waiter.wait(TableName=table_name)
+    print(f"Table {table_name} is ready.")
+
+#Retriving the table
+
+import json
+
+# Sample user profile
+user = {
+    'user_id':       {'S': 'U123'},
+    'email':         {'S': 'alice@example.com'},
+    'account_level': {'S': 'premium'},
+    'signup_ts':     {'N': '1687000000'}
+}
+
+# 1. Put item
+dynamodb.put_item(TableName=table_name, Item=user)
+print("Inserted user U123 into DynamoDB.")
+
+# 2. Get item
+resp = dynamodb.get_item(
+    TableName=table_name,
+    Key={'user_id': {'S': 'U123'}}
+)
+item = resp.get('Item')
+print("Retrieved:", json.dumps(item, indent=2))
+
+# Neptune graph data base
+
+pip install gremlinpython
+
+from gremlin_python.driver import client, serializer
+
+neptune_endpoint = 'wss://your-neptune-endpoint:8182/gremlin'
+g_client = client.Client(
+    neptune_endpoint,
+    'g',
+    username="",
+    password="",
+    message_serializer=serializer.GraphSONSerializersV2d0()
+)
+
+# 1. Add a user vertex
+g_client.submit(
+    "g.addV('User').property('user_id','U123').property('email','alice@example.com')"
+).all().result()
+
+# 2. Add a device vertex
+g_client.submit(
+    "g.addV('Device').property('device_id','iPhone12,1')"
+).all().result()
+
+# 3. Link user → device with an edge “USED”
+g_client.submit(
+    """
+    g.V().has('User','user_id','U123')
+     .addE('USED')
+     .to(g.V().has('Device','device_id','iPhone12,1'))
+     .property('ts', 1687112345000)
+    """
+).all().result()
+
+print("User U123 and Device iPhone12,1 vertices created and linked.")
+
+# Find all devices used by U123
+resp = g_client.submit(
+    "g.V().has('User','user_id','U123').out('USED').values('device_id')"
+).all().result()
+print("Devices for U123:", resp)
