@@ -1,0 +1,17 @@
+WIth Friends as
+  (SELECT
+    user1_id,
+    User2_id,
+    FROM Friendship
+    WHERE user1_id = 1 OR User2_id = 1  
+    ), 
+SELECT
+CASE 
+ WHEN F.User_id THEN page_id 
+ WHEN F.User_id THEN page_id
+ ELSE 0 
+ END as Recommeded_page
+FROM Likes L
+JOIN Friends F ON L.user1_id = F.user1_id AND f.User2_id
+HAVING COUNT(page_id) < 2
+ORDER BY recommeded_page ASC;
