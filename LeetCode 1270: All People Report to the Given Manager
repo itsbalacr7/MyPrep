@@ -1,0 +1,13 @@
+WITH Only_Employees AS (
+  SELECT 
+    name,
+    id,
+    managerid
+  FROM Employee
+  WHERE managerid IS NOT NULL
+)
+SELECT 
+  E.name 
+FROM Only_Employees E
+JOIN Employee M ON E.managerid = M.id
+WHERE E.id != E.managerid;
