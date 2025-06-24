@@ -1,0 +1,32 @@
+WITH female AS (
+  SELECT 
+    gender,
+    day,
+    SUM(score_points) AS F_Score
+  FROM Scores
+  WHERE gender = 'F'
+  GROUP BY day, gender
+),
+male AS (
+  SELECT 
+    gender,
+    day,
+    SUM(score_points) AS M_Score
+  FROM Scores
+  WHERE gender = 'M'
+  GROUP BY day, gender
+)
+SELECT
+  'F' AS gender,
+  f.day,
+  F_Score AS total
+FROM female f
+
+UNION ALL
+
+SELECT
+  'M' AS gender,
+  m.day,
+  M_Score AS total
+FROM male m
+ORDER BY day ASC;
