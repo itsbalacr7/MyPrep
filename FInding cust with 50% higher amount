@@ -1,0 +1,27 @@
+WITH may_totals AS (
+  SELECT customer_id, SUM(order_amount) AS may_total
+  FROM Orders
+  WHERE order_date BETWEEN '2025-05-01' AND '2025-05-31'
+  GROUP BY customer_id
+),
+june_totals AS (
+  SELECT customer_id, SUM(order_amount) AS june_total
+  FROM Orders
+  WHERE order_date BETWEEN '2025-06-01' AND '2025-06-30'
+  GROUP BY customer_id
+)
+SELECT
+  c.customer_id,
+  c.customer_name,
+  COALESCE(m.may_total, 0) AS may_total,
+  COALESCE(j.june_total, 0) AS june_total,
+  ROUND(
+    ((COALESCE(j.june_total, 0) - COALESCE(m.may_total, 0))
+     / NULLIF(COALESCE(m.may_total, 0), 0)) * 100
+  , 2) AS pct_increase
+FROM Customers c
+LEFT JOIN may_totals m ON c.customer_id = m.customer_id
+LEFT JOIN june_totals j ON c.customer_id = j.customer_id
+WHERE m.may_total > 0
+  AND ((j.june_total - m.may_total) / m.may_total) * 100 >= 50
+ORDER BY pct_increase DESC;
