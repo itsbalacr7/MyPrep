@@ -1,0 +1,49 @@
+-- Step 1: Get the most recent review date for each project
+WITH MostRecentReviewDate AS (
+  SELECT 
+    project_id,
+    MAX(review_date) AS latest_review
+  FROM Performance
+  GROUP BY project_id
+),
+
+-- Step 2: Get performance entries that occurred on the latest review date
+LatestProjectReviews AS (
+  SELECT 
+    perf.project_id,
+    perf.employee_id,
+    perf.score,
+    perf.review_date
+  FROM Performance perf
+  JOIN MostRecentReviewDate mr
+    ON perf.project_id = mr.project_id 
+   AND perf.review_date = mr.latest_review
+),
+
+-- Step 3: Assign ranks to employees based on their scores per project
+RankedTopPerformers AS (
+  SELECT 
+    reviews.project_id,
+    reviews.employee_id,
+    emp.name,
+    reviews.score,
+    reviews.review_date,
+    DENSE_RANK() OVER (
+      PARTITION BY reviews.project_id 
+      ORDER BY reviews.score DESC
+    ) AS performance_rank
+  FROM LatestProjectReviews reviews
+  JOIN Employees emp 
+    ON reviews.employee_id = emp.employee_id
+)
+
+-- Step 4: Return top 2 ranked employees per project (including ties)
+SELECT 
+  project_id,
+  employee_id,
+  name,
+  score,
+  review_date
+FROM RankedTopPerformers
+WHERE performance_rank <= 2
+ORDER BY project_id, performance_rank, employee_id;
