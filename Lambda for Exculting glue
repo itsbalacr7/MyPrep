@@ -1,0 +1,6 @@
+Import boto3
+import JSON
+GlueExecution = Boto3.client('glue)
+Def lambda_handler(event, context)
+GlueRxecution.Run_glue_job(jobname = 'GlueJobJson')
+return 'lambda run'
