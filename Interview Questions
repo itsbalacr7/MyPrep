@@ -1,0 +1,25 @@
+#find number of consequtive customers 
+
+SELECT 
+Column1, 
+column2,
+count(*)
+FROM 
+TABLE 
+GROUP BY column1, COlumn2
+having count(*) > 1
+
+#select customers who havn't returned 
+
+SELECT *
+FROM 
+Orders
+JOIN 
+WHERE customername NOT in (SELECT  customername from returns)
+
+#latest order by date 
+  
+SELECT 
+Max(order_date)
+from orders
+group by customer_id
