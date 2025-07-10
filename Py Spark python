@@ -1,0 +1,9 @@
+#read the file in HDFS 
+
+Df = spark.read.csv("pathlocation",header = 'true', inferschema = 'true', multiline = 'true')            # here we define a DF to read the csv file and make the first as header also assign the schema on it own
+
+
+#Filtering
+df.select('column1','column2').show()
+
+
