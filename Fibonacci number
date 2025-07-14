@@ -1,0 +1,9 @@
+def fab(n)
+ If 
+   N==1 
+   return 0
+ ELSIf 
+   n==2
+   return 1
+ ELSE
+   return Fab(n-1)+fab(n-1)
