@@ -1,0 +1,6 @@
+Def Nat(n):
+ IF: 
+  n==1
+  return 1
+ ELSE: 
+  return (n*n) + nat(n-1)
