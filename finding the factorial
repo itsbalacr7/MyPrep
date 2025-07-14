@@ -1,0 +1,8 @@
+def fact (n)
+ IF 
+  N==0 or n==1
+  return 1
+ else 
+  n>=2
+  N* fact(n-1)
+  
