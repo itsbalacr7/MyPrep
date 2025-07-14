@@ -1,0 +1,12 @@
+Def ARM(n):
+  IF:
+    N==(1-9)
+    return n
+  ELSE:
+    SUM = 0
+    TN = n
+    lenght = len(str(n))
+While TN > 0
+Digit = tn % 10 
+SUM = SUM + (digit ** tn)
+TN = TN // 10    
